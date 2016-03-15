@@ -1,6 +1,5 @@
 var turf = require('turf'),
 _ = require('underscore'),
-cellWidths = _.range(0.010,1,0.2),
 units = 'kilometers',
 N = [],
 e = [],
@@ -36,12 +35,13 @@ module.exports = function (tileLayers, tile, writeData, done) {
 
 
     for (var i = 0; i < tileLayers.osm.osm.length; i++) {
-         var feature = tileLayers.osm.osm.feature(i)
+         var feature = tileLayers.osm.osm.feature(i);
 
 
         if (boundaries.indexOf(feature.properties.boundary) === -1) continue
         if (feature.properties.boundary =='administrative') {
-          var ft = feature.toGeoJSON(tile[0],tile[1],tile[2])
+          var ft = feature.toGeoJSON(tile[0],tile[1],tile[2]);
+          var cellWidths = _.range(0.010,1,0.2);
 
           var bbox = turf.extent(ft);
           cellWidths.map(    function (c) {
@@ -56,13 +56,17 @@ module.exports = function (tileLayers, tile, writeData, done) {
               var clipped = turfbboxclip(ft,turf.extent(x))
               // check if clip is empty or cell contains data
               // .geometry.coordinates.length > 0
-              if (clipped.geometry.coordinates.length > 0) countCellWithData += 1
+              if (clipped.geometry.coordinates.length > 0) {
+                countCellWithData += 1
+                console.log(countCellWithData);
+              }
             })
-
+            console.log('finita una dimensione di griglia')
             // log tranform the data before pushing it to the N array
             // Number of cells containing object (N)
-            N.push(Math.log(countCellWithData));
 
+            N.push(Math.log(countCellWithData));
+            console.log('finite tutte le dimensioni, quindi finita una figura');
           })
 
           //just for clarity
@@ -78,8 +82,9 @@ module.exports = function (tileLayers, tile, writeData, done) {
               numberOfCellsContaingFeature: N
           })
 
-          console.log(fractalDim);
+          // console.log(fractalDim);
         }
+      }
         // usa la sua parte di reduce per il calcolo della lsqn
         // ma fallo non qui bensi in reduce vero e proprio
         // console.log('Fractal dimension is ' + lsq(N, e));
@@ -98,7 +103,7 @@ module.exports = function (tileLayers, tile, writeData, done) {
         //     length: roadLength
         // })
 
-    }
+
 
     // var tortuosity = tortuosities.reduce(function(prev, curr) {
     //     if (curr.dist > 0) { // ignore closed loops ?
