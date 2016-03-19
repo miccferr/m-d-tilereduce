@@ -14,8 +14,8 @@ var opts = {
 
 var tilereduce = tilereduce(opts)
 .on('reduce', function(result, tile){
-  // console.log('QUESTO E IL RISULTATO');
-  // console.log(result);
+  console.log('QUESTO E IL RISULTATO');
+  console.log(result);
 })
 .on('end', function() {
 })

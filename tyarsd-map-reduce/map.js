@@ -32,25 +32,34 @@ module.exports = function (tileLayers, tile, writeData, done) {
 
     // if (roadTypes.indexOf(feature.properties.highway) === -1) continue
 
+    // algorithm:
+    // iterate over every admin boundary
+    // take a single boundary
+    // define n cell width
+    // for ervery cell width:
+    //  fit a sqare grid onto the boundary
+    //  count num of grid cells containing part of the boudanry
+    // produce new grid with new cell dimension
+    // repeate count
 
-
+    var cellWidths = _.range(0.010,1,0.2);
+    // for every feature in mbtiles
     for (var i = 0; i < tileLayers.osm.osm.length; i++) {
          var feature = tileLayers.osm.osm.feature(i);
 
-
+        //  check if boundary
         if (boundaries.indexOf(feature.properties.boundary) === -1) continue
         if (feature.properties.boundary =='administrative') {
           var ft = feature.toGeoJSON(tile[0],tile[1],tile[2]);
-          var cellWidths = _.range(0.010,1,0.2);
-
           var bbox = turf.extent(ft);
-          cellWidths.map(    function (c) {
-            // create vector grid
-            var cellWidth = c;
-            var countCellWithData = 0
+
+          // for every cell width/dimension
+          cellWidths.map(    function (cellWidth) {
+            // fit vector grid onto feataure
             var squareGrid = turf.squareGrid(bbox, cellWidth, units);
 
             // for each grid cell..
+            var countCellWithData = 0
             _.each(squareGrid.features, function(x){
               // clip cell with line..
               var clipped = turfbboxclip(ft,turf.extent(x))
@@ -64,7 +73,6 @@ module.exports = function (tileLayers, tile, writeData, done) {
             console.log('finita una dimensione di griglia')
             // log tranform the data before pushing it to the N array
             // Number of cells containing object (N)
-
             N.push(Math.log(countCellWithData));
             console.log('finite tutte le dimensioni, quindi finita una figura');
           })
